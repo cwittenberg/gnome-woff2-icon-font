@@ -281,6 +281,19 @@
             color: var(--hig-blue);
             font-weight: 800;
         }
+        
+        .explanation h3 {
+            margin-top: 1.5rem;
+        }
+
+        .explanation a {
+            color: var(--hig-blue);
+            text-decoration: none;
+        }
+
+        .explanation a:hover {
+            text-decoration: underline;
+        }
 
         .explanation pre {
             background-color: var(--code-bg);
@@ -348,17 +361,9 @@
     <div class="explanation">
         <h2>How to Use This Font & Guidelines</h2>
         
-        <h3>Typography and Identity</h3>
-        <p>The visual identity of this page and the materials for the GNOME project rely on consistent typography. For printed materials and websites, the <strong>Inter</strong> typeface should be used[cite: 3].</p>
-
-        <h3>Applying GNOME Brand Colors</h3>
-        <p>Color is a critical element of the GNOME visual identity and brand recognition[cite: 3]. You can style your icons using the official GNOME Human Interface Guidelines (HIG) color palette[cite: 3]. The color palette is categorized as follows[cite: 3]:</p>
-        <ul>
-            <li><strong>Primary:</strong> Blue (<code>#3584e4</code>)[cite: 3].</li>
-            <li><strong>Secondary:</strong> Orange (<code>#FF7800</code>), Purple (<code>#9141AC</code>), Green (<code>#33D17A</code>), and Red (<code>#E01B24</code>)[cite: 3].</li>
-            <li><strong>Neutral:</strong> White (<code>#FFFFFF</code>), Grey (<code>#77767B</code>), and Quite Black (<code>#241F31</code>)[cite: 3].</li>
-        </ul>
-        <p>The controls at the top of this page allow you to dynamically apply these exact hex values to the rendered font icons using CSS variables.</p>
+        <h3>Typography & Brand Colors</h3>
+        <p>The visual identity of this page, including its typography and color palette, follows the official GNOME Brand guidelines. For comprehensive instructions on how to properly use these visual elements, spacing, and specific color hex codes in your materials, please refer to the GNOME Brand Book and visit <a href="https://brand.gnome.org" target="_blank">brand.gnome.org</a>.</p>
+        <p>The controls at the top of this page allow you to dynamically apply the exact GNOME HIG color values to the rendered font icons to test how they look.</p>
 
         <h3>Dynamic Loading Requirements</h3>
         <p>This visualization uses JavaScript's <code>fetch()</code> API to read your <code>gnome.css</code> file dynamically without hardcoding it. Because of browser security constraints regarding cross-origin requests, <strong>you must run this HTML file through a local web server</strong> (e.g., <code>python -m http.server</code> or NodeJS <code>http-server</code>). It will not work if simply double-clicked via the <code>file://</code> protocol.</p>
