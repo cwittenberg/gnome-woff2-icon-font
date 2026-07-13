@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GNOME Font Visualization</title>
+    
+    <!-- Link to external gnome.css dynamically -->
+    <link rel="stylesheet" href="gnome.css">
+    
+    <style>
+        /* Base Page Styling based on GNOME Brand Guidelines */
+        :root {
+            /* GNOME HIG Colors */
+            --hig-blue: #3584e4;
+            --hig-orange: #FF7800;
+            --hig-purple: #9141AC;
+            --hig-green: #33D17A;
+            --hig-red: #E01B24;
+            --hig-white: #FFFFFF;
+            --hig-grey: #77767B;
+            --hig-black: #241F31;
+            
+            /* Theming */
+            --bg-color: #fafafa;
+            --fg-color: var(--hig-black);
+            --card-bg: var(--hig-white);
+            --card-border: #e5e6e6;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Dynamic Icon Color */
+            --icon-color: var(--hig-black);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--fg-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 900; /* Inter Heavy */
+            color: var(--fg-color);
+        }
+
+        header p {
+            color: var(--hig-grey);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* HIG Color Controls */
+        .color-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            flex-wrap: wrap;
+        }
+
+        .color-controls span {
+            font-weight: bold;
+            color: var(--hig-grey);
+        }
+
+        .color-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Icon Grid Styling */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .icon-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .icon-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--hig-blue);
+        }
+
+        .icon-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--icon-color);
+            transition: color 0.3s ease;
+        }
+
+        .icon-card span {
+            font-size: 0.85rem;
+            color: var(--hig-grey);
+            word-break: break-all;
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--hig-red);
+            padding: 2rem;
+            background: #ffe5e5;
+            border-radius: 8px;
+            border: 1px solid var(--hig-red);
+        }
+
+        /* Explanation Section Styling */
+        .explanation {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .explanation h2 {
+            margin-top: 0;
+            color: var(--hig-blue);
+            font-weight: 800;
+        }
+
+        .explanation pre {
+            background-color: #f6f5f4;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--card-border);
+            font-family: monospace;
+        }
+
+        code {
+            background-color: #f6f5f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>GNOME Web Font Icons</h1>
+    <p>Dynamically loaded from <code>gnome.css</code>. Click a color to apply GNOME HIG themes.</p>
+</header>
+
+<div class="container">
+    
+    <!-- GNOME HIG Color Picker -->
+    <div class="color-controls">
+        <span>Apply HIG Color:</span>
+        <button class="color-btn" style="background-color: #3584e4;" title="Primary Blue" onclick="setIconColor('#3584e4')"></button>
+        <button class="color-btn" style="background-color: #FF7800;" title="Secondary Orange" onclick="setIconColor('#FF7800')"></button>
+        <button class="color-btn" style="background-color: #9141AC;" title="Purple" onclick="setIconColor('#9141AC')"></button>
+        <button class="color-btn" style="background-color: #33D17A;" title="Green" onclick="setIconColor('#33D17A')"></button>
+        <button class="color-btn" style="background-color: #E01B24;" title="Red" onclick="setIconColor('#E01B24')"></button>
+        <button class="color-btn" style="background-color: #77767B;" title="Grey" onclick="setIconColor('#77767B')"></button>
+        <button class="color-btn" style="background-color: #241F31;" title="Quite Black" onclick="setIconColor('#241F31')"></button>
+    </div>
+
+    <!-- Grid where JavaScript will dynamically inject the glyphs -->
+    <div id="icon-grid" class="grid">
+        <!-- Icons populated by JS -->
+    </div>
+
+    <div class="explanation">
+        <h2>How to Use This Font & Guidelines</h2>
+        
+        <h3>Typography and Identity</h3>
+        <p>The visual identity of this page and the materials for the GNOME project rely on consistent typography. For printed materials and websites, the <strong>Inter</strong> typeface should be used[cite: 3].</p>
+
+        <h3>Applying GNOME Brand Colors</h3>
+        <p>Color is a critical element of the GNOME visual identity and brand recognition[cite: 3]. You can style your icons using the official GNOME Human Interface Guidelines (HIG) color palette[cite: 3]. The color palette is categorized as follows[cite: 3]:</p>
+        <ul>
+            <li><strong>Primary:</strong> Blue (<code>#3584e4</code>)[cite: 3].</li>
+            <li><strong>Secondary:</strong> Orange (<code>#FF7800</code>), Purple (<code>#9141AC</code>), Green (<code>#33D17A</code>), and Red (<code>#E01B24</code>)[cite: 3].</li>
+            <li><strong>Neutral:</strong> White (<code>#FFFFFF</code>), Grey (<code>#77767B</code>), and Quite Black (<code>#241F31</code>)[cite: 3].</li>
+        </ul>
+        <p>The controls at the top of this page allow you to dynamically apply these exact hex values to the rendered font icons using CSS variables.</p>
+
+        <h3>Dynamic Loading Requirements</h3>
+        <p>This visualization uses JavaScript's <code>fetch()</code> API to read your <code>gnome.css</code> file dynamically without hardcoding it. Because of browser security constraints regarding cross-origin requests, <strong>you must run this HTML file through a local web server</strong> (e.g., <code>python -m http.server</code> or NodeJS <code>http-server</code>). It will not work if simply double-clicked via the <code>file://</code> protocol.</p>
+
+        <h3>Embedding in Your Project</h3>
+        <p>Ensure both <code>gnome.css</code> and <code>gnome.woff2</code> are accessible. Link the CSS in your document head:</p>
+<pre><code>&lt;link rel="stylesheet" href="gnome.css"&gt;</code></pre>
+
+        <p>Then, render an icon by using an <code>&lt;i&gt;</code> tag with the base class and specific icon class:</p>
+<pre><code>&lt;!-- Renders the desktop icon in HIG Blue --&gt;
+&lt;i class="icon icon-desktop" style="color: #3584e4;"&gt;&lt;/i&gt;</code></pre>
+    </div>
+</div>
+
+<script>
+    // Function to update the CSS variable for icon color
+    function setIconColor(hexCode) {
+        document.documentElement.style.setProperty('--icon-color', hexCode);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const grid = document.getElementById('icon-grid');
+
+        // Dynamically fetch the gnome.css file
+        fetch('gnome.css')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(cssContent => {
+                // Regex to parse the dynamically declared classes in the CSS file
+                const regex = /\.icon-([^:]+)::before\s*\{\s*content:\s*"([^"]+)";\s*\}/g;
+                let match;
+                let iconCount = 0;
+                
+                // Extract all valid icon matches from the CSS content
+                while ((match = regex.exec(cssContent)) !== null) {
+                    iconCount++;
+                    const iconName = match[1];
+                    
+                    // Generate the container card
+                    const card = document.createElement('div');
+                    card.className = 'icon-card';
+                    card.title = 'Click to copy class name';
+                    
+                    // Generate the <i> tag utilizing the dynamically loaded font
+                    const iTag = document.createElement('i');
+                    iTag.className = 'icon icon-' + iconName;
+                    
+                    // Generate the text label
+                    const label = document.createElement('span');
+                    label.textContent = '.icon-' + iconName;
+                    
+                    // Append elements
+                    card.appendChild(iTag);
+                    card.appendChild(label);
+                    grid.appendChild(card);
+
+                    // Add clipboard copy functionality
+                    card.addEventListener('click', () => {
+                        navigator.clipboard.writeText('icon-' + iconName).then(() => {
+                            const originalText = label.textContent;
+                            label.textContent = 'Copied!';
+                            label.style.color = 'var(--hig-blue)';
+                            setTimeout(() => {
+                                label.textContent = originalText;
+                                label.style.color = 'var(--hig-grey)';
+                            }, 1000);
+                        });
+                    });
+                }
+
+                // Handling if CSS is loaded but no matches are found
+                if(iconCount === 0) {
+                    throw new Error("CSS file was loaded, but no valid icon formats were found.");
+                }
+            })
+            .catch(err => {
+                // Displaying a helpful error message if fetch fails (e.g., due to CORS or missing file)
+                grid.innerHTML = `
+                    <div class="error-message">
+                        <strong>Failed to load icons dynamically.</strong><br>
+                        Error details: ${err.message}<br><br>
+                        <em>Note: Make sure <code>gnome.css</code> is in the same directory. If you are opening this file locally via <code>file://</code>, the browser blocks dynamic fetching. Please serve this folder using a local web server (e.g., <code>python -m http.server</code>).</em>
+                    </div>
+                `;
+            });
+    });
+</script>
+
+</body>
+</html>
