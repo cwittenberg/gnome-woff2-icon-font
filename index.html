@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GNOME Font Visualization</title>
+    <title>GNOME Font Visualizer</title>
     
     <!-- Link to external gnome.css dynamically -->
     <link rel="stylesheet" href="gnome.css">
@@ -21,15 +21,28 @@
             --hig-grey: #77767B;
             --hig-black: #241F31;
             
-            /* Theming */
+            /* Light Theme Defaults */
             --bg-color: #fafafa;
             --fg-color: var(--hig-black);
             --card-bg: var(--hig-white);
             --card-border: #e5e6e6;
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --code-bg: #f6f5f4;
             
-            /* Dynamic Icon Color */
-            --icon-color: var(--hig-black);
+            /* Dynamic Icon Color (Defaults to fg-color) */
+            --default-icon-color: var(--hig-black);
+            --icon-color: var(--default-icon-color);
+
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Dark Theme Override */
+        body.dark-mode {
+            --bg-color: var(--hig-black);
+            --fg-color: var(--hig-white);
+            --card-bg: #3D3846; /* A lighter HIG-aligned dark shade for contrast */
+            --card-border: #5E5C64;
+            --code-bg: #2a2536;
+            --default-icon-color: var(--hig-white);
         }
 
         body {
@@ -39,6 +52,7 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         header {
@@ -47,12 +61,13 @@
             text-align: center;
             border-bottom: 1px solid var(--card-border);
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         header h1 {
             margin: 0;
             font-size: 2.5rem;
-            font-weight: 900; /* Inter Heavy */
+            font-weight: 900;
             color: var(--fg-color);
         }
 
@@ -68,18 +83,69 @@
             padding: 2rem;
         }
 
-        /* HIG Color Controls */
-        .color-controls {
+        /* Tools & Controls Container */
+        .controls-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 1.5rem;
             margin-bottom: 2rem;
             padding: 1.5rem;
             background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid var(--card-border);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .search-and-theme {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
             flex-wrap: wrap;
+        }
+
+        .search-bar {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            background: var(--bg-color);
+            color: var(--fg-color);
+            font-size: 1rem;
+            flex-grow: 1;
+            max-width: 400px;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+        }
+
+        .search-bar:focus {
+            border-color: var(--hig-blue);
+        }
+
+        .action-btn {
+            background: var(--bg-color);
+            color: var(--fg-color);
+            border: 1px solid var(--card-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: background-color 0.2s, border-color 0.3s, color 0.3s;
+        }
+
+        .action-btn:hover {
+            border-color: var(--hig-blue);
+        }
+
+        /* HIG Color Controls */
+        .color-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--card-border);
+            transition: border-color 0.3s;
         }
 
         .color-controls span {
@@ -100,6 +166,15 @@
             transform: scale(1.1);
         }
 
+        .reset-color-btn {
+            background: none;
+            border: none;
+            color: var(--hig-blue);
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
         /* Icon Grid Styling */
         .grid {
             display: grid;
@@ -118,8 +193,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.3s;
         }
 
         .icon-card:hover {
@@ -136,9 +210,36 @@
         }
 
         .icon-card span {
-            font-size: 0.85rem;
-            color: var(--hig-grey);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--fg-color);
             word-break: break-all;
+            transition: color 0.3s;
+        }
+
+        .copy-btn {
+            margin-top: 1rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            color: var(--fg-color);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--hig-blue);
+            color: var(--hig-white);
+            border-color: var(--hig-blue);
+        }
+
+        .copy-btn.copied {
+            background: var(--hig-green);
+            color: var(--hig-white);
+            border-color: var(--hig-green);
         }
 
         /* Error Message Styling */
@@ -159,6 +260,7 @@
             border-radius: 12px;
             padding: 2.5rem;
             margin-top: 2rem;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .explanation h2 {
@@ -168,19 +270,21 @@
         }
 
         .explanation pre {
-            background-color: #f6f5f4;
+            background-color: var(--code-bg);
             padding: 1rem;
             border-radius: 8px;
             overflow-x: auto;
             border: 1px solid var(--card-border);
             font-family: monospace;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         code {
-            background-color: #f6f5f4;
+            background-color: var(--code-bg);
             padding: 0.2rem 0.4rem;
             border-radius: 4px;
             font-family: monospace;
+            transition: background-color 0.3s;
         }
     </style>
 </head>
@@ -188,21 +292,31 @@
 
 <header>
     <h1>GNOME Web Font Icons</h1>
-    <p>Dynamically loaded from <code>gnome.css</code>. Click a color to apply GNOME HIG themes.</p>
+    <p>Dynamically loaded from <code>gnome.css</code>. Made to show the different font glyphs available and how they look like in HIG color</p>
 </header>
 
 <div class="container">
     
-    <!-- GNOME HIG Color Picker -->
-    <div class="color-controls">
-        <span>Apply HIG Color:</span>
-        <button class="color-btn" style="background-color: #3584e4;" title="Primary Blue" onclick="setIconColor('#3584e4')"></button>
-        <button class="color-btn" style="background-color: #FF7800;" title="Secondary Orange" onclick="setIconColor('#FF7800')"></button>
-        <button class="color-btn" style="background-color: #9141AC;" title="Purple" onclick="setIconColor('#9141AC')"></button>
-        <button class="color-btn" style="background-color: #33D17A;" title="Green" onclick="setIconColor('#33D17A')"></button>
-        <button class="color-btn" style="background-color: #E01B24;" title="Red" onclick="setIconColor('#E01B24')"></button>
-        <button class="color-btn" style="background-color: #77767B;" title="Grey" onclick="setIconColor('#77767B')"></button>
-        <button class="color-btn" style="background-color: #241F31;" title="Quite Black" onclick="setIconColor('#241F31')"></button>
+    <!-- Tools & Controls -->
+    <div class="controls-container">
+        
+        <div class="search-and-theme">
+            <input type="text" id="search-input" class="search-bar" placeholder="Search for a glyph (e.g. desktop, power)...">
+            <button id="theme-toggle" class="action-btn">Toggle Dark Mode</button>
+        </div>
+
+        <div class="color-controls">
+            <span>Apply HIG Color:</span>
+            <button class="color-btn" style="background-color: #3584e4;" title="Primary Blue" onclick="setIconColor('#3584e4')"></button>
+            <button class="color-btn" style="background-color: #FF7800;" title="Secondary Orange" onclick="setIconColor('#FF7800')"></button>
+            <button class="color-btn" style="background-color: #9141AC;" title="Purple" onclick="setIconColor('#9141AC')"></button>
+            <button class="color-btn" style="background-color: #33D17A;" title="Green" onclick="setIconColor('#33D17A')"></button>
+            <button class="color-btn" style="background-color: #E01B24;" title="Red" onclick="setIconColor('#E01B24')"></button>
+            <button class="color-btn" style="background-color: #77767B;" title="Grey" onclick="setIconColor('#77767B')"></button>
+            <button class="color-btn" style="background-color: #241F31;" title="Quite Black" onclick="setIconColor('#241F31')"></button>
+            <button class="reset-color-btn" onclick="resetIconColor()">Reset Color</button>
+        </div>
+
     </div>
 
     <!-- Grid where JavaScript will dynamically inject the glyphs -->
@@ -239,10 +353,33 @@
 </div>
 
 <script>
-    // Function to update the CSS variable for icon color
+    // Functions to manage icon colors
     function setIconColor(hexCode) {
         document.documentElement.style.setProperty('--icon-color', hexCode);
     }
+    function resetIconColor() {
+        document.documentElement.style.setProperty('--icon-color', 'var(--default-icon-color)');
+    }
+
+    // Toggle Dark Mode
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // Live Search Functionality
+    document.getElementById('search-input').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const cards = document.querySelectorAll('.icon-card');
+        
+        cards.forEach(card => {
+            const iconName = card.dataset.iconName.toLowerCase();
+            if (iconName.includes(searchTerm)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
 
     document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById('icon-grid');
@@ -264,38 +401,44 @@
                 // Extract all valid icon matches from the CSS content
                 while ((match = regex.exec(cssContent)) !== null) {
                     iconCount++;
-                    const iconName = match[1];
+                    const iconName = match[1]; // Already strips the `.icon-` prefix from capture group
                     
                     // Generate the container card
                     const card = document.createElement('div');
                     card.className = 'icon-card';
-                    card.title = 'Click to copy class name';
+                    card.dataset.iconName = iconName; // Data attribute for search indexing
                     
                     // Generate the <i> tag utilizing the dynamically loaded font
                     const iTag = document.createElement('i');
                     iTag.className = 'icon icon-' + iconName;
                     
-                    // Generate the text label
+                    // Generate the clean text label without "icon-" prefix
                     const label = document.createElement('span');
-                    label.textContent = '.icon-' + iconName;
+                    label.textContent = iconName;
                     
-                    // Append elements
-                    card.appendChild(iTag);
-                    card.appendChild(label);
-                    grid.appendChild(card);
-
-                    // Add clipboard copy functionality
-                    card.addEventListener('click', () => {
-                        navigator.clipboard.writeText('icon-' + iconName).then(() => {
-                            const originalText = label.textContent;
-                            label.textContent = 'Copied!';
-                            label.style.color = 'var(--hig-blue)';
+                    // Generate the explicit copy button
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'copy-btn';
+                    copyBtn.textContent = 'Copy Tag';
+                    
+                    copyBtn.addEventListener('click', (e) => {
+                        const htmlTag = `<i class="icon icon-${iconName}"></i>`;
+                        navigator.clipboard.writeText(htmlTag).then(() => {
+                            const originalText = copyBtn.textContent;
+                            copyBtn.textContent = 'Copied!';
+                            copyBtn.classList.add('copied');
                             setTimeout(() => {
-                                label.textContent = originalText;
-                                label.style.color = 'var(--hig-grey)';
+                                copyBtn.textContent = originalText;
+                                copyBtn.classList.remove('copied');
                             }, 1000);
                         });
                     });
+
+                    // Append elements
+                    card.appendChild(iTag);
+                    card.appendChild(label);
+                    card.appendChild(copyBtn);
+                    grid.appendChild(card);
                 }
 
                 // Handling if CSS is loaded but no matches are found
