@@ -32,6 +32,7 @@
             --default-icon-color: var(--fg-color);
             --icon-color: var(--default-icon-color);
             --icon-base-size: 3rem; /* 48px base */
+            --card-min-width: 180px; /* Dynamic grid sizing to support huge icons */
 
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
@@ -155,7 +156,7 @@
         }
 
         #size-display {
-            min-width: 50px;
+            min-width: 60px;
             text-align: center;
         }
 
@@ -200,7 +201,7 @@
         /* Icon Grid Styling */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width), 1fr));
             gap: 1.5rem;
             margin-bottom: 4rem;
         }
@@ -217,6 +218,7 @@
             text-align: center;
             transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.2s;
             cursor: pointer;
+            overflow: hidden;
         }
 
         .icon-card:hover {
@@ -238,6 +240,7 @@
             color: var(--fg-color);
             word-break: break-all;
             transition: color 0.2s;
+            max-width: 100%;
         }
 
         /* Copied State Feedback */
@@ -346,14 +349,14 @@
         <h2>How to Use This Font & Guidelines</h2>
         
         <h3>Typography and Identity</h3>
-        <p>The visual identity of this page and the materials for the GNOME project rely on consistent typography. For printed materials and websites, the <strong>Inter</strong> typeface should be used.</p>
+        <p>The visual identity of this page and the materials for the GNOME project rely on consistent typography. For printed materials and websites, the <strong>Inter</strong> typeface should be used[cite: 3].</p>
 
         <h3>Applying GNOME Brand Colors</h3>
-        <p>Color is a critical element of the GNOME visual identity and brand recognition. You can style your icons using the official GNOME Human Interface Guidelines (HIG) color palette. The color palette is categorized as follows:</p>
+        <p>Color is a critical element of the GNOME visual identity and brand recognition[cite: 3]. You can style your icons using the official GNOME Human Interface Guidelines (HIG) color palette[cite: 3]. The color palette is categorized as follows[cite: 3]:</p>
         <ul>
-            <li><strong>Primary:</strong> Blue (<code>#3584e4</code>).</li>
-            <li><strong>Secondary:</strong> Orange (<code>#FF7800</code>), Purple (<code>#9141AC</code>), Green (<code>#33D17A</code>), and Red (<code>#E01B24</code>).</li>
-            <li><strong>Neutral:</strong> White (<code>#FFFFFF</code>), Grey (<code>#77767B</code>), and Quite Black (<code>#241F31</code>).</li>
+            <li><strong>Primary:</strong> Blue (<code>#3584e4</code>)[cite: 3].</li>
+            <li><strong>Secondary:</strong> Orange (<code>#FF7800</code>), Purple (<code>#9141AC</code>), Green (<code>#33D17A</code>), and Red (<code>#E01B24</code>)[cite: 3].</li>
+            <li><strong>Neutral:</strong> White (<code>#FFFFFF</code>), Grey (<code>#77767B</code>), and Quite Black (<code>#241F31</code>)[cite: 3].</li>
         </ul>
         <p>The controls at the top of this page allow you to dynamically apply these exact hex values to the rendered font icons using CSS variables.</p>
 
@@ -382,12 +385,18 @@
     // --- Icon Size Management ---
     let currentIconSize = 3; // Base size in rem (48px)
     const minSize = 1;       // 16px
-    const maxSize = 6;       // 96px
+    const maxSize = 16;      // 256px
     const sizeStep = 0.5;    // 8px increments
     const sizeDisplay = document.getElementById('size-display');
 
     function updateSizeDisplay() {
         document.documentElement.style.setProperty('--icon-base-size', `${currentIconSize}rem`);
+        
+        // Dynamically scale the grid column min-width so huge icons don't overflow the cards
+        // Padding is roughly 60px inside the card
+        const cardWidth = Math.max(180, (currentIconSize * 16) + 60); 
+        document.documentElement.style.setProperty('--card-min-width', `${cardWidth}px`);
+        
         sizeDisplay.textContent = `${currentIconSize * 16}px`;
     }
 
@@ -404,6 +413,9 @@
             updateSizeDisplay();
         }
     });
+
+    // Initialize size display on load
+    updateSizeDisplay();
 
     // --- Theme Management ---
     document.getElementById('theme-toggle').addEventListener('click', () => {
