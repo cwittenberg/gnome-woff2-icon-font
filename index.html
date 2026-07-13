@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GNOME Font Visualizer</title>
+    <title>GNOME Font Visualization</title>
     
     <!-- Link to external gnome.css dynamically -->
     <link rel="stylesheet" href="gnome.css">
     
     <style>
-        /* Base Page Styling based on GNOME Brand Guidelines */
+        /* Base Page Styling based on GNOME Brand Guidelines & Adwaita */
         :root {
             /* GNOME HIG Colors */
             --hig-blue: #3584e4;
@@ -21,28 +21,29 @@
             --hig-grey: #77767B;
             --hig-black: #241F31;
             
-            /* Light Theme Defaults */
+            /* Light Theme Defaults (Adwaita Light) */
             --bg-color: #fafafa;
-            --fg-color: var(--hig-black);
-            --card-bg: var(--hig-white);
+            --fg-color: rgba(0, 0, 0, 0.8);
+            --card-bg: #ffffff;
             --card-border: #e5e6e6;
             --code-bg: #f6f5f4;
             
-            /* Dynamic Icon Color (Defaults to fg-color) */
-            --default-icon-color: var(--hig-black);
+            /* Dynamic Variables */
+            --default-icon-color: var(--fg-color);
             --icon-color: var(--default-icon-color);
+            --icon-base-size: 3rem; /* 48px base */
 
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* Dark Theme Override */
+        /* Dark Theme Override (Adwaita Dark HIG) */
         body.dark-mode {
-            --bg-color: var(--hig-black);
-            --fg-color: var(--hig-white);
-            --card-bg: #3D3846; /* A lighter HIG-aligned dark shade for contrast */
-            --card-border: #5E5C64;
-            --code-bg: #2a2536;
-            --default-icon-color: var(--hig-white);
+            --bg-color: #242424; 
+            --fg-color: #ffffff;
+            --card-bg: #303030;
+            --card-border: rgba(255, 255, 255, 0.15);
+            --code-bg: #1e1e1e;
+            --default-icon-color: #ffffff;
         }
 
         body {
@@ -137,6 +138,27 @@
             border-color: var(--hig-blue);
         }
 
+        /* Size Controls */
+        .size-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--hig-grey);
+            font-weight: bold;
+        }
+
+        .icon-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 1.2rem;
+            line-height: 1;
+            border-radius: 8px;
+        }
+
+        #size-display {
+            min-width: 50px;
+            text-align: center;
+        }
+
         /* HIG Color Controls */
         .color-controls {
             display: flex;
@@ -187,13 +209,14 @@
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.2s;
+            cursor: pointer;
         }
 
         .icon-card:hover {
@@ -203,10 +226,10 @@
         }
 
         .icon-card i {
-            font-size: 3rem;
+            font-size: var(--icon-base-size);
             margin-bottom: 1rem;
             color: var(--icon-color);
-            transition: color 0.3s ease;
+            transition: color 0.2s ease, font-size 0.2s ease;
         }
 
         .icon-card span {
@@ -214,32 +237,19 @@
             font-weight: 600;
             color: var(--fg-color);
             word-break: break-all;
-            transition: color 0.3s;
+            transition: color 0.2s;
         }
 
-        .copy-btn {
-            margin-top: 1rem;
-            padding: 0.4rem 0.8rem;
-            background: var(--bg-color);
-            border: 1px solid var(--card-border);
-            border-radius: 6px;
-            color: var(--fg-color);
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: var(--hig-blue);
-            color: var(--hig-white);
-            border-color: var(--hig-blue);
-        }
-
-        .copy-btn.copied {
-            background: var(--hig-green);
-            color: var(--hig-white);
+        /* Copied State Feedback */
+        .icon-card.copied-feedback {
             border-color: var(--hig-green);
+            box-shadow: 0 4px 12px rgba(51, 209, 122, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .icon-card.copied-feedback i,
+        .icon-card.copied-feedback span {
+            color: var(--hig-green) !important; /* Force green over active dynamic colors */
         }
 
         /* Error Message Styling */
@@ -292,7 +302,7 @@
 
 <header>
     <h1>GNOME Web Font Icons</h1>
-    <p>Dynamically loaded from <code>gnome.css</code>. Made to show the different font glyphs available and how they look like in HIG color</p>
+    <p>Dynamically loaded from <code>gnome.css</code>. Click any icon to copy its HTML tag.</p>
 </header>
 
 <div class="container">
@@ -302,6 +312,14 @@
         
         <div class="search-and-theme">
             <input type="text" id="search-input" class="search-bar" placeholder="Search for a glyph (e.g. desktop, power)...">
+            
+            <div class="size-controls">
+                <span>Size:</span>
+                <button id="shrink-btn" class="action-btn icon-btn" title="Shrink Icons">-</button>
+                <span id="size-display">48px</span>
+                <button id="enlarge-btn" class="action-btn icon-btn" title="Enlarge Icons">+</button>
+            </div>
+
             <button id="theme-toggle" class="action-btn">Toggle Dark Mode</button>
         </div>
 
@@ -328,14 +346,14 @@
         <h2>How to Use This Font & Guidelines</h2>
         
         <h3>Typography and Identity</h3>
-        <p>The visual identity of this page and the materials for the GNOME project rely on consistent typography. For printed materials and websites, the <strong>Inter</strong> typeface should be used[cite: 3].</p>
+        <p>The visual identity of this page and the materials for the GNOME project rely on consistent typography. For printed materials and websites, the <strong>Inter</strong> typeface should be used.</p>
 
         <h3>Applying GNOME Brand Colors</h3>
-        <p>Color is a critical element of the GNOME visual identity and brand recognition[cite: 3]. You can style your icons using the official GNOME Human Interface Guidelines (HIG) color palette[cite: 3]. The color palette is categorized as follows[cite: 3]:</p>
+        <p>Color is a critical element of the GNOME visual identity and brand recognition. You can style your icons using the official GNOME Human Interface Guidelines (HIG) color palette. The color palette is categorized as follows:</p>
         <ul>
-            <li><strong>Primary:</strong> Blue (<code>#3584e4</code>)[cite: 3].</li>
-            <li><strong>Secondary:</strong> Orange (<code>#FF7800</code>), Purple (<code>#9141AC</code>), Green (<code>#33D17A</code>), and Red (<code>#E01B24</code>)[cite: 3].</li>
-            <li><strong>Neutral:</strong> White (<code>#FFFFFF</code>), Grey (<code>#77767B</code>), and Quite Black (<code>#241F31</code>)[cite: 3].</li>
+            <li><strong>Primary:</strong> Blue (<code>#3584e4</code>).</li>
+            <li><strong>Secondary:</strong> Orange (<code>#FF7800</code>), Purple (<code>#9141AC</code>), Green (<code>#33D17A</code>), and Red (<code>#E01B24</code>).</li>
+            <li><strong>Neutral:</strong> White (<code>#FFFFFF</code>), Grey (<code>#77767B</code>), and Quite Black (<code>#241F31</code>).</li>
         </ul>
         <p>The controls at the top of this page allow you to dynamically apply these exact hex values to the rendered font icons using CSS variables.</p>
 
@@ -353,7 +371,7 @@
 </div>
 
 <script>
-    // Functions to manage icon colors
+    // --- Icon Color Management ---
     function setIconColor(hexCode) {
         document.documentElement.style.setProperty('--icon-color', hexCode);
     }
@@ -361,12 +379,38 @@
         document.documentElement.style.setProperty('--icon-color', 'var(--default-icon-color)');
     }
 
-    // Toggle Dark Mode
+    // --- Icon Size Management ---
+    let currentIconSize = 3; // Base size in rem (48px)
+    const minSize = 1;       // 16px
+    const maxSize = 6;       // 96px
+    const sizeStep = 0.5;    // 8px increments
+    const sizeDisplay = document.getElementById('size-display');
+
+    function updateSizeDisplay() {
+        document.documentElement.style.setProperty('--icon-base-size', `${currentIconSize}rem`);
+        sizeDisplay.textContent = `${currentIconSize * 16}px`;
+    }
+
+    document.getElementById('enlarge-btn').addEventListener('click', () => {
+        if(currentIconSize < maxSize) {
+            currentIconSize += sizeStep;
+            updateSizeDisplay();
+        }
+    });
+
+    document.getElementById('shrink-btn').addEventListener('click', () => {
+        if(currentIconSize > minSize) {
+            currentIconSize -= sizeStep;
+            updateSizeDisplay();
+        }
+    });
+
+    // --- Theme Management ---
     document.getElementById('theme-toggle').addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
     });
 
-    // Live Search Functionality
+    // --- Live Search Functionality ---
     document.getElementById('search-input').addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const cards = document.querySelectorAll('.icon-card');
@@ -381,6 +425,7 @@
         });
     });
 
+    // --- Dynamic Loading & Parsing ---
     document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById('icon-grid');
 
@@ -407,6 +452,7 @@
                     const card = document.createElement('div');
                     card.className = 'icon-card';
                     card.dataset.iconName = iconName; // Data attribute for search indexing
+                    card.title = `Click to copy HTML tag`;
                     
                     // Generate the <i> tag utilizing the dynamically loaded font
                     const iTag = document.createElement('i');
@@ -416,28 +462,26 @@
                     const label = document.createElement('span');
                     label.textContent = iconName;
                     
-                    // Generate the explicit copy button
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'copy-btn';
-                    copyBtn.textContent = 'Copy Tag';
-                    
-                    copyBtn.addEventListener('click', (e) => {
+                    // Add click-to-copy event to the entire card
+                    card.addEventListener('click', () => {
                         const htmlTag = `<i class="icon icon-${iconName}"></i>`;
                         navigator.clipboard.writeText(htmlTag).then(() => {
-                            const originalText = copyBtn.textContent;
-                            copyBtn.textContent = 'Copied!';
-                            copyBtn.classList.add('copied');
+                            // Visual feedback logic
+                            const originalText = iconName;
+                            label.textContent = 'Copied!';
+                            card.classList.add('copied-feedback');
+                            
+                            // Remove feedback after 1.2 seconds
                             setTimeout(() => {
-                                copyBtn.textContent = originalText;
-                                copyBtn.classList.remove('copied');
-                            }, 1000);
+                                label.textContent = originalText;
+                                card.classList.remove('copied-feedback');
+                            }, 1200);
                         });
                     });
 
                     // Append elements
                     card.appendChild(iTag);
                     card.appendChild(label);
-                    card.appendChild(copyBtn);
                     grid.appendChild(card);
                 }
 
