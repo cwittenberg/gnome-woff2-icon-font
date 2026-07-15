@@ -396,7 +396,7 @@
 <script>
     // --- Global State ---
     let showColorIcons = false;
-    let activeColor = null; // Track selected color definitively to ensure smart inversion
+    let activeColor = null; // Track selected color definitively
 
     // --- Icon Color Management ---
     function setIconColor(hexCode) {
@@ -405,6 +405,7 @@
     }
     function resetIconColor() {
         activeColor = null;
+        // Reset to theme default
         document.documentElement.style.setProperty('--icon-color', 'var(--default-icon-color)');
     }
 
@@ -417,12 +418,8 @@
 
     function updateSizeDisplay() {
         document.documentElement.style.setProperty('--icon-base-size', `${currentIconSize}rem`);
-        
-        // Dynamically scale the grid column min-width so huge icons don't overflow the cards
-        // Padding is roughly 60px inside the card
         const cardWidth = Math.max(180, (currentIconSize * 16) + 60); 
         document.documentElement.style.setProperty('--card-min-width', `${cardWidth}px`);
-        
         sizeDisplay.textContent = `${currentIconSize * 16}px`;
     }
 
@@ -440,18 +437,23 @@
         }
     });
 
-    // Initialize size display on load
     updateSizeDisplay();
 
     // --- Theme Management ---
     document.getElementById('theme-toggle').addEventListener('click', () => {
         const isDarkMode = document.body.classList.toggle('dark-mode');
         
-        // Smart color inversion for HIG Black and White when toggling themes
-        if (isDarkMode && activeColor === '#241F31') {
+        // Smart color inversion logic
+        // 1. If currently using "Quite Black" (#241F31), swap to White.
+        // 2. If currently using White, swap to "Quite Black".
+        // 3. If default (activeColor === null), reset to force CSS variable refresh.
+        if (activeColor === '#241F31' && isDarkMode) {
             setIconColor('#FFFFFF');
-        } else if (!isDarkMode && activeColor === '#FFFFFF') {
+        } else if (activeColor === '#FFFFFF' && !isDarkMode) {
             setIconColor('#241F31');
+        } else {
+            // If activeColor was null, this effectively just refreshes the CSS var
+            resetIconColor();
         }
     });
 
@@ -480,23 +482,20 @@
         
         const higColorControls = document.getElementById('hig-color-controls');
         
-        // Active visual state for the button & HIG Controls visibility
         if (showColorIcons) {
             e.target.style.borderColor = 'var(--hig-blue)';
             e.target.style.color = 'var(--hig-blue)';
-            higColorControls.classList.add('hidden'); // Cannot override baked in COLR/CPAL layers
+            higColorControls.classList.add('hidden'); 
         } else {
             e.target.style.borderColor = '';
             e.target.style.color = '';
             higColorControls.classList.remove('hidden');
         }
 
-        // Apply toggled class to relevant grids dynamically
         document.querySelectorAll('.icon-card').forEach(card => {
             const baseName = card.dataset.baseName;
             const hasColor = card.dataset.hasColor === 'true';
             
-            // Only toggle icons that actively have a parsed '-color' counterpart 
             if (hasColor) {
                 const iTag = card.querySelector('i');
                 const label = card.querySelector('span');
@@ -517,7 +516,6 @@
     document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById('icon-grid');
 
-        // Dynamically fetch the gnome.css file
         fetch('gnome.css')
             .then(response => {
                 if (!response.ok) {
@@ -532,7 +530,6 @@
                 const baseIcons = new Set();
                 const colorIcons = new Set();
                 
-                // 1. First iteration to pair Base and -color glyphs logically
                 while ((match = regex.exec(cssContent)) !== null) {
                     const rawName = match[1];
                     if (rawName.endsWith('-color')) {
@@ -544,45 +541,36 @@
 
                 const allUniqueBases = new Set([...baseIcons, ...colorIcons]);
 
-                // Handling if CSS is loaded but no matches are found
                 if(allUniqueBases.size === 0) {
                     throw new Error("CSS file was loaded, but no valid icon formats were found.");
                 }
 
-                // 2. Second pass to generate grid cards with paired relationships
                 allUniqueBases.forEach(baseName => {
                     const hasColor = colorIcons.has(baseName);
                     const hasBase = baseIcons.has(baseName);
                     
-                    // Generate the container card
                     const card = document.createElement('div');
                     card.className = 'icon-card';
                     card.dataset.baseName = baseName;
                     card.dataset.hasColor = hasColor;
                     card.title = `Click to copy HTML tag`;
                     
-                    // Fallback visually if a user uploads a '-color' explicitly without standardizing a monochrome pairing
                     const initialName = (hasBase) ? baseName : `${baseName}-color`;
 
-                    // Generate the <i> tag utilizing the dynamically loaded font
                     const iTag = document.createElement('i');
                     iTag.className = `icon icon-${initialName}`;
                     
-                    // Generate the clean text label
                     const label = document.createElement('span');
                     label.textContent = initialName;
                     
-                    // Add click-to-copy event to the entire card safely checking state
                     card.addEventListener('click', () => {
                         const currentName = (showColorIcons && hasColor) ? `${baseName}-color` : initialName;
                         const htmlTag = `<i class="icon icon-${currentName}"></i>`;
                         
                         navigator.clipboard.writeText(htmlTag).then(() => {
-                            // Visual feedback logic
                             label.textContent = 'Copied!';
                             card.classList.add('copied-feedback');
                             
-                            // Re-evaluate what the text should be on reset (to handle mid-timeout switch toggles safely)
                             setTimeout(() => {
                                 label.textContent = (showColorIcons && hasColor) ? `${baseName}-color` : initialName;
                                 card.classList.remove('copied-feedback');
@@ -590,14 +578,12 @@
                         });
                     });
 
-                    // Append elements
                     card.appendChild(iTag);
                     card.appendChild(label);
                     grid.appendChild(card);
                 });
             })
             .catch(err => {
-                // Displaying a helpful error message if fetch fails (e.g., due to CORS or missing file)
                 grid.innerHTML = `
                     <div class="error-message">
                         <strong>Failed to load icons dynamically.</strong><br>
