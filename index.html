@@ -442,7 +442,16 @@
 
     // --- Theme Management ---
     document.getElementById('theme-toggle').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        
+        // Smart color inversion for HIG Black and White when toggling themes
+        const currentColor = document.documentElement.style.getPropertyValue('--icon-color').trim().toUpperCase();
+        
+        if (isDarkMode && currentColor === '#241F31') {
+            setIconColor('#FFFFFF');
+        } else if (!isDarkMode && currentColor === '#FFFFFF') {
+            setIconColor('#241F31');
+        }
     });
 
     // --- Live Search Functionality ---
