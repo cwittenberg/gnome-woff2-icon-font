@@ -171,6 +171,10 @@
             transition: border-color 0.3s;
         }
 
+        .color-controls.hidden {
+            display: none;
+        }
+
         .color-controls span {
             font-weight: bold;
             color: var(--hig-grey);
@@ -187,6 +191,15 @@
 
         .color-btn:hover {
             transform: scale(1.1);
+        }
+
+        /* Hide white button by default, show in dark mode */
+        .white-btn {
+            display: none;
+        }
+
+        body.dark-mode .white-btn {
+            display: inline-block;
         }
 
         .reset-color-btn {
@@ -340,7 +353,7 @@
             <button id="theme-toggle" class="action-btn">Toggle Dark Mode</button>
         </div>
 
-        <div class="color-controls">
+        <div class="color-controls" id="hig-color-controls">
             <span>Apply HIG Color:</span>
             <button class="color-btn" style="background-color: #3584e4;" title="Primary Blue" onclick="setIconColor('#3584e4')"></button>
             <button class="color-btn" style="background-color: #FF7800;" title="Secondary Orange" onclick="setIconColor('#FF7800')"></button>
@@ -349,6 +362,7 @@
             <button class="color-btn" style="background-color: #E01B24;" title="Red" onclick="setIconColor('#E01B24')"></button>
             <button class="color-btn" style="background-color: #77767B;" title="Grey" onclick="setIconColor('#77767B')"></button>
             <button class="color-btn" style="background-color: #241F31;" title="Quite Black" onclick="setIconColor('#241F31')"></button>
+            <button class="color-btn white-btn" style="background-color: #FFFFFF;" title="White" onclick="setIconColor('#FFFFFF')"></button>
             <button class="reset-color-btn" onclick="resetIconColor()">Reset Color</button>
         </div>
 
@@ -454,13 +468,17 @@
         showColorIcons = !showColorIcons;
         e.target.textContent = showColorIcons ? 'Show Monochrome Icons' : 'Show Color Icons';
         
-        // Active visual state for the button
+        const higColorControls = document.getElementById('hig-color-controls');
+        
+        // Active visual state for the button & HIG Controls visibility
         if (showColorIcons) {
             e.target.style.borderColor = 'var(--hig-blue)';
             e.target.style.color = 'var(--hig-blue)';
+            higColorControls.classList.add('hidden'); // Cannot override baked in COLR/CPAL layers
         } else {
             e.target.style.borderColor = '';
             e.target.style.color = '';
+            higColorControls.classList.remove('hidden');
         }
 
         // Apply toggled class to relevant grids dynamically
