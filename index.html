@@ -396,12 +396,15 @@
 <script>
     // --- Global State ---
     let showColorIcons = false;
+    let activeColor = null; // Track selected color definitively to ensure smart inversion
 
     // --- Icon Color Management ---
     function setIconColor(hexCode) {
+        activeColor = hexCode.toUpperCase();
         document.documentElement.style.setProperty('--icon-color', hexCode);
     }
     function resetIconColor() {
+        activeColor = null;
         document.documentElement.style.setProperty('--icon-color', 'var(--default-icon-color)');
     }
 
@@ -445,11 +448,9 @@
         const isDarkMode = document.body.classList.toggle('dark-mode');
         
         // Smart color inversion for HIG Black and White when toggling themes
-        const currentColor = document.documentElement.style.getPropertyValue('--icon-color').trim().toUpperCase();
-        
-        if (isDarkMode && currentColor === '#241F31') {
+        if (isDarkMode && activeColor === '#241F31') {
             setIconColor('#FFFFFF');
-        } else if (!isDarkMode && currentColor === '#FFFFFF') {
+        } else if (!isDarkMode && activeColor === '#FFFFFF') {
             setIconColor('#241F31');
         }
     });
