@@ -335,7 +335,8 @@
                 <span id="size-display">48px</span>
                 <button id="enlarge-btn" class="action-btn icon-btn" title="Enlarge Icons">+</button>
             </div>
-
+            
+            <button id="color-toggle" class="action-btn">Show Color Icons</button>
             <button id="theme-toggle" class="action-btn">Toggle Dark Mode</button>
         </div>
 
@@ -379,6 +380,9 @@
 </div>
 
 <script>
+    // --- Global State ---
+    let showColorIcons = false;
+
     // --- Icon Color Management ---
     function setIconColor(hexCode) {
         document.documentElement.style.setProperty('--icon-color', hexCode);
@@ -433,11 +437,50 @@
         const cards = document.querySelectorAll('.icon-card');
         
         cards.forEach(card => {
-            const iconName = card.dataset.iconName.toLowerCase();
-            if (iconName.includes(searchTerm)) {
+            const baseName = card.dataset.baseName.toLowerCase();
+            const hasColor = card.dataset.hasColor === 'true';
+            const currentName = (showColorIcons && hasColor) ? `${baseName}-color` : baseName;
+            
+            if (currentName.includes(searchTerm)) {
                 card.style.display = 'flex';
             } else {
                 card.style.display = 'none';
+            }
+        });
+    });
+
+    // --- Color Icon Toggle Logic ---
+    document.getElementById('color-toggle').addEventListener('click', (e) => {
+        showColorIcons = !showColorIcons;
+        e.target.textContent = showColorIcons ? 'Show Monochrome Icons' : 'Show Color Icons';
+        
+        // Active visual state for the button
+        if (showColorIcons) {
+            e.target.style.borderColor = 'var(--hig-blue)';
+            e.target.style.color = 'var(--hig-blue)';
+        } else {
+            e.target.style.borderColor = '';
+            e.target.style.color = '';
+        }
+
+        // Apply toggled class to relevant grids dynamically
+        document.querySelectorAll('.icon-card').forEach(card => {
+            const baseName = card.dataset.baseName;
+            const hasColor = card.dataset.hasColor === 'true';
+            
+            // Only toggle icons that actively have a parsed '-color' counterpart 
+            if (hasColor) {
+                const iTag = card.querySelector('i');
+                const label = card.querySelector('span');
+                const isCopied = card.classList.contains('copied-feedback');
+
+                if (showColorIcons) {
+                    iTag.className = `icon icon-${baseName}-color`;
+                    if (!isCopied) label.textContent = `${baseName}-color`;
+                } else {
+                    iTag.className = `icon icon-${baseName}`;
+                    if (!isCopied) label.textContent = baseName;
+                }
             }
         });
     });
@@ -455,42 +498,65 @@
                 return response.text();
             })
             .then(cssContent => {
-                // Regex to parse the dynamically declared classes in the CSS file
                 const regex = /\.icon-([^:]+)::before\s*\{\s*content:\s*"([^"]+)";\s*\}/g;
                 let match;
-                let iconCount = 0;
                 
-                // Extract all valid icon matches from the CSS content
+                const baseIcons = new Set();
+                const colorIcons = new Set();
+                
+                // 1. First iteration to pair Base and -color glyphs logically
                 while ((match = regex.exec(cssContent)) !== null) {
-                    iconCount++;
-                    const iconName = match[1]; // Already strips the `.icon-` prefix from capture group
+                    const rawName = match[1];
+                    if (rawName.endsWith('-color')) {
+                        colorIcons.add(rawName.replace('-color', ''));
+                    } else {
+                        baseIcons.add(rawName);
+                    }
+                }
+
+                const allUniqueBases = new Set([...baseIcons, ...colorIcons]);
+
+                // Handling if CSS is loaded but no matches are found
+                if(allUniqueBases.size === 0) {
+                    throw new Error("CSS file was loaded, but no valid icon formats were found.");
+                }
+
+                // 2. Second pass to generate grid cards with paired relationships
+                allUniqueBases.forEach(baseName => {
+                    const hasColor = colorIcons.has(baseName);
+                    const hasBase = baseIcons.has(baseName);
                     
                     // Generate the container card
                     const card = document.createElement('div');
                     card.className = 'icon-card';
-                    card.dataset.iconName = iconName; // Data attribute for search indexing
+                    card.dataset.baseName = baseName;
+                    card.dataset.hasColor = hasColor;
                     card.title = `Click to copy HTML tag`;
                     
+                    // Fallback visually if a user uploads a '-color' explicitly without standardizing a monochrome pairing
+                    const initialName = (hasBase) ? baseName : `${baseName}-color`;
+
                     // Generate the <i> tag utilizing the dynamically loaded font
                     const iTag = document.createElement('i');
-                    iTag.className = 'icon icon-' + iconName;
+                    iTag.className = `icon icon-${initialName}`;
                     
-                    // Generate the clean text label without "icon-" prefix
+                    // Generate the clean text label
                     const label = document.createElement('span');
-                    label.textContent = iconName;
+                    label.textContent = initialName;
                     
-                    // Add click-to-copy event to the entire card
+                    // Add click-to-copy event to the entire card safely checking state
                     card.addEventListener('click', () => {
-                        const htmlTag = `<i class="icon icon-${iconName}"></i>`;
+                        const currentName = (showColorIcons && hasColor) ? `${baseName}-color` : initialName;
+                        const htmlTag = `<i class="icon icon-${currentName}"></i>`;
+                        
                         navigator.clipboard.writeText(htmlTag).then(() => {
                             // Visual feedback logic
-                            const originalText = iconName;
                             label.textContent = 'Copied!';
                             card.classList.add('copied-feedback');
                             
-                            // Remove feedback after 1.2 seconds
+                            // Re-evaluate what the text should be on reset (to handle mid-timeout switch toggles safely)
                             setTimeout(() => {
-                                label.textContent = originalText;
+                                label.textContent = (showColorIcons && hasColor) ? `${baseName}-color` : initialName;
                                 card.classList.remove('copied-feedback');
                             }, 1200);
                         });
@@ -500,12 +566,7 @@
                     card.appendChild(iTag);
                     card.appendChild(label);
                     grid.appendChild(card);
-                }
-
-                // Handling if CSS is loaded but no matches are found
-                if(iconCount === 0) {
-                    throw new Error("CSS file was loaded, but no valid icon formats were found.");
-                }
+                });
             })
             .catch(err => {
                 // Displaying a helpful error message if fetch fails (e.g., due to CORS or missing file)
