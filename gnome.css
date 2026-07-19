@@ -1,11 +1,11 @@
 @font-face {
-    font-family: 'gnome';
-    src: url('gnome.woff2') format('woff2');
+    font-family: 'gnome (1) (1) (1) (1) (1)';
+    src: url('gnome-(1)-(1)-(1)-(1)-(1).woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
 .icon {
-    font-family: 'gnome' !important;
+    font-family: 'gnome (1) (1) (1) (1) (1)' !important;
     speak: never;
     font-style: normal;
     font-weight: normal;
@@ -15,10 +15,10 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-.icon-gnome-horizontal-color::before { content: "\ea01"; }
-.icon-gnome-horizontal::before { content: "\ea02"; }
-.icon-gnome-brandmark-color::before { content: "\ea03"; }
-.icon-gnome-brandmark::before { content: "\ea04"; }
+.icon-gnome-brandmark-color::before { content: "\ec81"; }
+.icon-gnome-brandmark::before { content: "\ec82"; }
+.icon-gnome-horizontal-color::before { content: "\ec83"; }
+.icon-gnome-horizontal::before { content: "\ec84"; }
 .icon-gnome-vertical-color::before { content: "\ea05"; }
 .icon-gnome-vertical::before { content: "\ea06"; }
 .icon-gnome-extensions-color::before { content: "\ea07"; }
@@ -249,8 +249,6 @@
 .icon-spreadsheet::before { content: "\eae8"; }
 .icon-square-color::before { content: "\eae9"; }
 .icon-square::before { content: "\eaea"; }
-.icon-star-color::before { content: "\eaeb"; }
-.icon-star::before { content: "\eaec"; }
 .icon-suitcase-color::before { content: "\eaed"; }
 .icon-suitcase::before { content: "\eaee"; }
 .icon-switch-off-color::before { content: "\eaef"; }
@@ -647,3 +645,9 @@
 .icon-extension-remove::before { content: "\ec76"; }
 .icon-pin-extension-color::before { content: "\ec77"; }
 .icon-pin-extension::before { content: "\ec78"; }
+.icon-star-color::before { content: "\eaeb"; }
+.icon-star::before { content: "\eaec"; }
+.icon-row-view-color::before { content: "\ec79"; }
+.icon-row-view::before { content: "\ec7a"; }
+.icon-circle-color::before { content: "\ec7b"; }
+.icon-circle::before { content: "\ec7c"; }
