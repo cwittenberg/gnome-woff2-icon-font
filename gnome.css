@@ -1,11 +1,11 @@
 @font-face {
-    font-family: 'gnome (1) (1) (1) (1) (1)';
-    src: url('gnome-(1)-(1)-(1)-(1)-(1).woff2') format('woff2');
+    font-family: 'gnome';
+    src: url('gnome.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
 .icon {
-    font-family: 'gnome (1) (1) (1) (1) (1)' !important;
+    font-family: 'gnome' !important;
     speak: never;
     font-style: normal;
     font-weight: normal;
@@ -585,8 +585,8 @@
 .icon-container::before { content: "\ec3a"; }
 .icon-tux-color::before { content: "\ec3b"; }
 .icon-tux::before { content: "\ec3c"; }
-.icon-matrix-cbat-color::before { content: "\ec3d"; }
-.icon-matrix-cbat::before { content: "\ec3e"; }
+.icon-matrix-chat-color::before { content: "\ec85"; }
+.icon-matrix-chat::before { content: "\ec86"; }
 .icon-pasted-svg-1784155828477-color::before { content: "\ec3f"; }
 .icon-pasted-svg-1784155828477::before { content: "\ec40"; }
 .icon-pasted-svg-1784155838626-color::before { content: "\ec41"; }
@@ -651,3 +651,7 @@
 .icon-row-view::before { content: "\ec7a"; }
 .icon-circle-color::before { content: "\ec7b"; }
 .icon-circle::before { content: "\ec7c"; }
+.icon-x-color::before { content: "\ec87"; }
+.icon-x::before { content: "\ec88"; }
+.icon-markdown-color::before { content: "\ec89"; }
+.icon-markdown::before { content: "\ec8a"; }
